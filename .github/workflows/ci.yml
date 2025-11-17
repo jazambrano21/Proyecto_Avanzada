@@ -8,26 +8,16 @@ on:
 
 env:
   SPRING_PROFILES_ACTIVE: test
-  SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/testdb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-  SPRING_DATASOURCE_USERNAME: root
-  SPRING_DATASOURCE_PASSWORD: rootpass
+  SPRING_DATASOURCE_URL: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+  SPRING_DATASOURCE_USERNAME: sa
+  SPRING_DATASOURCE_PASSWORD: ''
   SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: rootpass
-          MYSQL_DATABASE: testdb
-          MYSQL_USER: testuser
-          MYSQL_PASSWORD: testpass
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    # Configuración de H2 en memoria - no se necesitan servicios adicionales
 
     steps:
     - uses: actions/checkout@v4
@@ -60,14 +50,10 @@ jobs:
       working-directory: ./gimnasioreserva-spring
       run: ./gradlew clean build -x test
       
-    - name: Run tests with MySQL
+    - name: Run tests with H2
       working-directory: ./gimnasioreserva-spring
       run: |
         ./gradlew test
-      env:
-        SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/testdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-        SPRING_DATASOURCE_USERNAME: root
-        SPRING_DATASOURCE_PASSWORD: rootpass
         
     - name: Upload test results
       if: always()
