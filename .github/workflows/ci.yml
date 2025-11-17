@@ -39,6 +39,7 @@ jobs:
         java-version: '17'
         
     - name: Navigate to Spring project
+      run: echo "Navigating to Spring project directory"
       working-directory: ./gimnasioreserva-spring
       
     - name: Grant execute permission for gradlew
